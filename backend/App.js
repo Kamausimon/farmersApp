@@ -8,7 +8,7 @@ const produceRouter = require("./Routes/produceRouter");
 const userRouter = require("./Routes/userRouter");
 
 //MIDDLEWARES
-app.get(express.json()); // this helps parse json data into req.body
+app.use(express.json()); // this helps parse json data into req.body
 
 app.use(morgan("dev")); //this is a logger with the properties dev
 

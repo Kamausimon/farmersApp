@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 
 dotenv.config({ path: "./config.env" });
 
-const DB = `mongodb+srv://kamausimon217:${process.env.DATABASE_PASSWORD}@cluster0.npptiwj.mongodb.net/?retryWrites=true&w=majority`;
+const DB = `mongodb+srv://kamausimon217:${process.env.DATABASE_PASSWORD}@cluster0.npptiwj.mongodb.net/?retryWrites=true&w=majority&tls=true`;
 
 const connectToDatabase = async () => {
   await mongoose.connect(DB);
