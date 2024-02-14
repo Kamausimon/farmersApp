@@ -20,11 +20,38 @@ const connect = async () => {
 const port = process.env.PORT || 3000;
 
 // Start the server
+let server;
 const startServer = async () => {
   await connect();
-  app.listen(port, () => {
+  server = app.listen(port, () => {
     console.log(`The server is listening on port: ${port}`);
   });
 };
 
 startServer();
+
+// Handle uncaught exceptions
+process.on("uncaughtException", (err) => {
+  console.error(new Date().toISOString(), err.name, err.message);
+  console.error("Uncaught exception...shutting down");
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+});
+
+// Handle unhandled rejections
+process.on("unhandledRejection", (err) => {
+  console.error(new Date().toISOString(), err.name, err.message);
+  console.error("Unhandled rejection...shutting down");
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+});

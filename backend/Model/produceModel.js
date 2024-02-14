@@ -9,6 +9,7 @@ const produceSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: [true, "The produce must have a price"],
+    default: 0,
   },
   description: {
     type: String,

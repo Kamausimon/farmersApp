@@ -1,5 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
+const globalerrorHandler = require("./Controller/errorController");
+const AppError = require("./utils/AppError");
 
 const app = express();
 
@@ -13,13 +15,17 @@ app.use(express.json()); // this helps parse json data into req.body
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev")); //this is a logger with the properties dev
 }
-//initialize the server
-app.get("/", (req, res) => {
-  res.send("Hello World");
-});
 
 //ROUTES
 app.use("/api/v1/produce", produceRouter);
 app.use("/api/v1/users", userRouter);
+
+//this handles all calls made to unspecified urls in our app
+app.all("*", (req, res, next) => {
+  next(new AppError(`cannot find ${req.originalUrl} on this server`, 404));
+});
+
+//universal error handler
+app.use(globalerrorHandler);
 
 module.exports = app;
