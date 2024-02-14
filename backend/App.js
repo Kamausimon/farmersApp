@@ -10,8 +10,9 @@ const userRouter = require("./Routes/userRouter");
 //MIDDLEWARES
 app.use(express.json()); // this helps parse json data into req.body
 
-app.use(morgan("dev")); //this is a logger with the properties dev
-
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev")); //this is a logger with the properties dev
+}
 //initialize the server
 app.get("/", (req, res) => {
   res.send("Hello World");
