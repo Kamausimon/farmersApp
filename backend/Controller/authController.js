@@ -53,12 +53,7 @@ exports.signUp = async (req, res, next) => {
       passwordConfirm: req.body.passwordConfirm,
     });
 
-    res.status(201).json({
-      status: "success",
-      data: {
-        newUser,
-      },
-    });
+    createSendToken(newUser, 201, res);
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -85,12 +80,7 @@ exports.login = async (req, res, next) => {
     }
 
     //if everything is okay
-    res.status(201).json({
-      status: "success",
-      data: {
-        user,
-      },
-    });
+    createSendToken(user, 201, res);
   } catch (err) {
     res.status(400).json({
       status: "fail",
