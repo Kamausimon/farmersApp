@@ -75,17 +75,17 @@ userSchema.pre("save", async function (next) {
 });
 
 //returns users that are active
-userSchema.pre(/^find/, function () {
+userSchema.pre(/^find/, function (next) {
   this.find({ active: { $ne: false } });
   next();
 });
 
 //middleware to compare the typed password with the stored password
-userSchema.methods.correctPassword = function (
+userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
 ) {
-  return bcrypt.compare(candidatePassword, userPassword);
+  return await bcrypt.compare(candidatePassword, userPassword);
 };
 
 //
