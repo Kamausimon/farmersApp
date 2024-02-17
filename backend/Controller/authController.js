@@ -10,6 +10,39 @@ exports.signToken = (id) => {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
+//create  a jwt sending function
+const createSendToken = (user, statusCode, res) => {
+  //jwt token as per the generated jwt
+  const token = signToken(user._id);
+
+  //define options for the cookie
+  const cookieOptions = {
+    expires: new Date(
+      Date.now + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 100
+    ),
+    httpOnly: true,
+  };
+
+  //set cookie options to secure in production
+  if (process.env.NODE_ENV === "production") {
+    cookieOptions.secure = true;
+  }
+
+  //set the cookie in a cookie named jtw
+  res.cookie("jwt", token, cookieOptions);
+
+  //remove the password from the response to prevent it from becoming exposed
+  user.password = undefined;
+
+  //send the response alongside the token
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user: user,
+    },
+  });
+};
 
 exports.signUp = async (req, res, next) => {
   try {
