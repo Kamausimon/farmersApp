@@ -2,8 +2,10 @@ const express = require("express");
 const morgan = require("morgan");
 const globalerrorHandler = require("./Controller/errorController");
 const AppError = require("./utils/AppError");
+const dotenv = require("dotenv");
 
 const app = express();
+dotenv.config({ path: "./config.env" });
 
 //ROUTER
 const produceRouter = require("./Routes/produceRouter");

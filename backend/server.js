@@ -42,7 +42,7 @@ process.on("uncaughtException", (err) => {
     process.exit(1);
   }
 });
-
+/* 
 // Handle unhandled rejections
 process.on("unhandledRejection", (err) => {
   console.error(new Date().toISOString(), err.name, err.message);
@@ -54,4 +54,4 @@ process.on("unhandledRejection", (err) => {
   } else {
     process.exit(1);
   }
-});
+}); */
