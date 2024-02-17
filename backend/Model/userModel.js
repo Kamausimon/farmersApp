@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema({
   //name, email, password,passwordConfirm, photo
@@ -49,6 +51,44 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
 });
+
+//hashing and storing the password
+userSchema.pre("save", async function (next) {
+  //if the password was not modified call next.
+  if (!this.isModified("password")) return next();
+
+  //salt the password
+  const hashedPassword = await bcrypt.hash(this.password, 12);
+  this.password = hashedPassword;
+
+  //delete the confirm password
+  this.passwordConfirm = undefined;
+  next();
+});
+
+//middleware to show the date when a password was changed
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password") || !this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+//returns users that are active
+userSchema.pre(/^find/, function () {
+  this.find({ active: { $ne: false } });
+  next();
+});
+
+//middleware to compare the typed password with the stored password
+userSchema.methods.correctPassword = function (
+  candidatePassword,
+  userPassword
+) {
+  return bcrypt.compare(candidatePassword, userPassword);
+};
+
+//
 
 const User = mongoose.model("User", userSchema);
 
