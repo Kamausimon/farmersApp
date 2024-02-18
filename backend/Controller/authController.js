@@ -108,6 +108,23 @@ exports.protectRoute = async (req, res, next) => {
 
   //verify the token
   const decoded = await promisfy(jwt.verify)(token, process.env.JWT_SECRET);
+
+  //check if the user making the request exists
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(new AppError("The user does not exist", 401));
+  }
+
+  //check if the user changed password after the token was used
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError("User recently changed password please login again", 401)
+    );
+  }
+
+  //if the current user is the true user allow access
+  req.user = currentUser;
+  next();
 };
 
 exports.restrict = () => {};
