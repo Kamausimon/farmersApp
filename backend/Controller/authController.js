@@ -3,6 +3,7 @@ const AppError = require("../utils/AppError");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto-js");
 const jwt = require("jsonwebtoken");
+const { promisfy } = require("util");
 
 //create a jtw sign token
 exports.signToken = (id) => {
@@ -89,7 +90,25 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.protectRoute = () => {};
+exports.protectRoute = async (req, res, next) => {
+  //confirm that the token is present
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.split(" ")[0] === "Bearer"
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  if (!token) {
+    return next(
+      new AppError("you are not logged in, Kindly login to access", 401)
+    );
+  }
+
+  //verify the token
+  const decoded = await promisfy(jwt.verify)(token, process.env.JWT_SECRET);
+};
 
 exports.restrict = () => {};
 
