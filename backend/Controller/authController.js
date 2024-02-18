@@ -127,7 +127,15 @@ exports.protectRoute = async (req, res, next) => {
   next();
 };
 
-exports.restrict = () => {};
+exports.restrictTo = (...roles) => {
+  // restict routes based on the roles
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(new AppError("you are not authorized to access this", 404));
+    }
+    next();
+  };
+};
 
 exports.forgotPassword = () => {};
 
