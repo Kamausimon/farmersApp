@@ -181,6 +181,46 @@ exports.forgotPassword = async (req, res, next) => {
   }
 };
 
-const resetPassword = async (req, res, next) => {};
+const resetPassword = async (req, res, next) => {
+  //get the user based on the token
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
 
-exports.updatePassword = () => {};
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  //if token has not expired and there is still a user at the end of it create a new password
+  if (!user) {
+    return next(new AppError("token is invalid or has expired", 401));
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  //login the user and send the jwt
+  createSendToken(user, 200, res);
+};
+
+exports.updatePassword = async (req, res, next) => {
+  //get the user from the collection
+  const user = await User.findUserById(req.user.id).select("+password");
+
+  //check if the password is correct
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError("your current password is wrong", 401));
+  }
+  //3 if so update the password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+  //user.findandupdate will not work as intended
+  //4 log user in send jwt
+  createSendToken(user, 200, res);
+};

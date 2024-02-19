@@ -3,9 +3,12 @@ const morgan = require("morgan");
 const globalerrorHandler = require("./Controller/errorController");
 const AppError = require("./utils/AppError");
 const dotenv = require("dotenv");
+const cors = require("cors");
 
 const app = express();
 dotenv.config({ path: "./config.env" });
+
+app.use(cors);
 
 //ROUTER
 const produceRouter = require("./Routes/produceRouter");
