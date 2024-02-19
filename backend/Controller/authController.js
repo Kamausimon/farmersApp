@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const { promisfy } = require("util");
+const sendmail = require("../utils/sendEmail");
 
 //create a jtw sign token
 exports.signToken = (id) => {
@@ -143,6 +144,43 @@ exports.forgotPassword = async (req, res, next) => {
   if (!user) {
     return next(new AppError("There is no user with that email address", 401));
   }
+
+  //create the random password reset token
+  const resetToken = createResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  //send the token back as an email
+  //3 send it back as an email
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/users/resetPassword/${resetToken}`;
+
+  const message = `Forgot your password? Click ${resetURL} to reset your password`;
+
+  try {
+    await sendmail({
+      email: user.email,
+      subject: "reset your password",
+      message,
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "token sent to email",
+    });
+  } catch (err) {
+    (user.passwordResetToken = undefined),
+      (user.passwordResetExpires = undefined);
+    await user.save({ validateBeforeSave: false }),
+      next(
+        new AppError(
+          "there was an error while sending the message. Try again later",
+          400
+        )
+      );
+  }
 };
+
+const resetPassword = async (req, res, next) => {};
 
 exports.updatePassword = () => {};
