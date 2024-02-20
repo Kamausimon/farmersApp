@@ -44,7 +44,7 @@ process.on("uncaughtException", (err) => {
 });
 
 // Handle unhandled rejections
-process.on("unhandledRejection", (err) => {
+/* process.on("unhandledRejection", (err) => {
   console.error(new Date().toISOString(), err.name, err.message);
   console.error("Unhandled rejection...shutting down");
   if (server) {
@@ -55,3 +55,4 @@ process.on("unhandledRejection", (err) => {
     process.exit(1);
   }
 });
+ */

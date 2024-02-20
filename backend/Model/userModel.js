@@ -101,19 +101,29 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 };
 
 //this creates a password reset token
-userSchema.methods.createResetToken = function () {
-  const resetToken = crypto.randomBytes(32).toString("hex");
+userSchema.methods.createResetToken = async function () {
+  try {
+    // Generate a random token
+    const resetToken = crypto.randomBytes(32).toString("hex");
 
-  this.passwordResetToken = crypto
-    .createHash("sha256")
-    .update(resetToken)
-    .digest("hex");
+    // Hash the token
+    this.passwordResetToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
 
-  console.log({ resetToken }, this.passwordResetToken);
+    console.log({ resetToken }, this.passwordResetToken);
+    // Set token and expiry date on the user object
 
-  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-  return resetToken;
+    // Return the original unhashed token for use in generating the reset URL
+    return resetToken;
+  } catch (error) {
+    // Handle any errors that occur during token generation
+    console.error("Error generating reset token:", error);
+    throw new Error("Could not generate reset token");
+  }
 };
 
 const User = mongoose.model("User", userSchema);
