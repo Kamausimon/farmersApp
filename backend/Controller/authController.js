@@ -3,8 +3,11 @@ const AppError = require("../utils/AppError");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-const { promisfy } = require("util");
+const { promisify } = require("util");
 const sendEmail = require("../utils/sendEmail");
+const dotenv = require("dotenv");
+
+dotenv.config({ path: "./config.env" });
 
 //create a jtw sign token
 const signToken = (id) => {
@@ -20,7 +23,7 @@ const createSendToken = (user, statusCode, res) => {
   //define options for the cookie
   const cookieOptions = {
     expires: new Date(
-      Date.now + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
   };
@@ -92,40 +95,45 @@ exports.login = async (req, res, next) => {
 };
 
 exports.protectRoute = async (req, res, next) => {
-  //confirm that the token is present
-  let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.split(" ")[0] === "Bearer"
-  ) {
-    token = req.headers.authorization.split(" ")[1];
+  try {
+    //confirm that the token is present
+    let token;
+
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    }
+
+    if (!token) {
+      return next(
+        new AppError("you are not logged in, Kindly login to access", 401)
+      );
+    }
+
+    //verify the token
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    //check if the user making the request exists
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return next(new AppError("The user does not exist", 401));
+    }
+
+    //check if the user changed password after the token was used
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next(
+        new AppError("User recently changed password please login again", 401)
+      );
+    }
+
+    //if the current user is the true user allow access
+    req.user = currentUser;
+    next();
+  } catch (err) {
+    console.log(err);
   }
-
-  if (!token) {
-    return next(
-      new AppError("you are not logged in, Kindly login to access", 401)
-    );
-  }
-
-  //verify the token
-  const decoded = await promisfy(jwt.verify)(token, process.env.JWT_SECRET);
-
-  //check if the user making the request exists
-  const currentUser = await User.findById(decoded.id);
-  if (!currentUser) {
-    return next(new AppError("The user does not exist", 401));
-  }
-
-  //check if the user changed password after the token was used
-  if (currentUser.changedPasswordAfter(decoded.iat)) {
-    return next(
-      new AppError("User recently changed password please login again", 401)
-    );
-  }
-
-  //if the current user is the true user allow access
-  req.user = currentUser;
-  next();
 };
 
 exports.restrictTo = (...roles) => {
@@ -146,7 +154,7 @@ exports.forgotPassword = async (req, res, next) => {
   }
   //2 Generate the random token
   const resetToken = user.createResetToken();
-  console.log(resetToken);
+
   await user.save({ validateBeforeSave: false });
   //3 send it back as an email
   const resetURL = `${req.protocol}://${req.get(
