@@ -12,10 +12,17 @@ router
   .route("/updatePassword")
   .patch(authController.protectRoute, authController.updatePassword);
 
-router.route("/").get(userController.getAllUsers);
-router.route("/").post(userController.createNewUser);
+router
+  .route("/adminGetAllUsers")
+  .get(
+    authController.protectRoute,
+    authController.restrictToAdmin,
+    userController.getAllUsers
+  );
 
-router.route("/:id").get(userController.getOneUser);
+router
+  .route("/:id")
+  .get(authController.protectRoute, userController.getOneUser);
 router.route("/:id").patch(userController.updateUserDetails);
 router.route("/:id").delete(userController.deleteUser);
 

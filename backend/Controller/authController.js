@@ -56,6 +56,7 @@ exports.signUp = async (req, res, next) => {
       email: req.body.email,
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
+      role: req.body.role,
     });
 
     createSendToken(newUser, 201, res);
@@ -265,5 +266,19 @@ exports.updatePassword = async (req, res, next) => {
   } catch (error) {
     console.error("Error updating password:", error);
     next(new AppError("An error occurred while updating password", 500));
+  }
+};
+
+exports.restrictToAdmin = (req, res, next) => {
+  //check if the user is an admin
+  if (req.user.role !== "admin") {
+    return next(
+      new AppError("You are not authorized to perform this action", 403)
+    );
+  }
+
+  //if the user is an admin allow access to the next middleware
+  if (req.user && req.user.role === "admin") {
+    next();
   }
 };
