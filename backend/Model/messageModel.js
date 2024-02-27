@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const messaggeSchema = new mongoose.schema({
+const messageSchema = new mongoose.schema({
    sender:{
      type:mongoose.schema.ObjectId,
      ref:"user",
@@ -9,7 +9,7 @@ const messaggeSchema = new mongoose.schema({
    receiver:{
     type:mongoose.schema.ObjectId,
     ref:"User",
-    required:[true. ' a message must have a receiver']
+    required:[true. 'a message must have a receiver']
    },
    content:{
        type:String,
@@ -20,3 +20,7 @@ const messaggeSchema = new mongoose.schema({
     default:Date.now()
    }
 });
+
+const Message = mongoose.model("Message", messageSchema)
+
+module.exports = Message;

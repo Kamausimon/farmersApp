@@ -130,3 +130,21 @@ exports.deleteProduce = async (req, res, next) => {
     });
   }
 };
+
+exports.produceOwnershipConfirmation = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    //find the produce
+    const produce = Produce.findById(id);
+    //check if the produce's user id matches the person making the request and if not say they are not allowed
+    if (produce.user.toString() !== req.user._id.toString()) {
+      next(new AppError("You are not authorized to make this request", 400));
+    }
+    //if matching allow to the next middleware
+    next();
+  } catch (err) {
+    console.log("Error making the requested changes");
+    next(new AppError("An error occurred while making the update", 500));
+  }
+};
