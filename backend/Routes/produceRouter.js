@@ -7,21 +7,25 @@ const router = express.Router();
 router.route("/").get(produceController.getAllProduce);
 router
   .route("/")
-  .post(authController.protectRoute, produceController.createNewProduce);
+  .post(
+    authController.protectRoute,
+    authController.restrictTo("farmer"),
+    produceController.createNewProduce
+  );
 
 router.route("/:id").get(produceController.getOneProduce);
 router
   .route("/:id")
   .patch(
     authController.protectRoute,
-    produceController.produceOwnershipConfirmation,
+    authController.restrictTo("admin", "farmer"),
     produceController.updateOneProduce
   );
 router
   .route("/:id")
   .delete(
     authController.protectRoute,
-    produceController.produceOwnershipConfirmation,
+    authController.restrictTo("admin", "farmer"),
     produceController.deleteProduce
   );
 

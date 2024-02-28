@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 
-const messageSchema = new mongoose.schema({
+const messageSchema = new mongoose.Schema({
    sender:{
-     type:mongoose.schema.ObjectId,
+     type:mongoose.Schema.ObjectId,
      ref:"user",
      required:[true, 'a message must have the senders input']
    },
    receiver:{
-    type:mongoose.schema.ObjectId,
+    type:mongoose.Schema.ObjectId,
     ref:"User",
     required:[true. 'a message must have a receiver']
    },

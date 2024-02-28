@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const reviewSchema = new mongoose.schema({
+const reviewSchema = new mongoose.Schema({
   review: {
     type: "String",
     required: [true, "Provide a review on the product"],
@@ -16,13 +16,13 @@ const reviewSchema = new mongoose.schema({
   },
   //review must be connected to the product
   product: {
-    type: mongoose.schema.ObjectId,
+    type: mongoose.Schema.ObjectId,
     ref: "Product",
     required: [true, "review must belong to a product"],
   },
   //review must be connected to the user
   user: {
-    type: mongoose.schema.ObjectId,
+    type: mongoose.Schema.ObjectId,
     ref: "User",
     required: [true, "review must belong to a user"],
   },
