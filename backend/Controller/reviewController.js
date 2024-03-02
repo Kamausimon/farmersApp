@@ -47,12 +47,58 @@ exports.createReview = async (req, res, next) => {
       },
     });
   } catch (err) {
-    console.log();
+    console.log("cannot create the review");
+    next(new AppError("There was an error while creating the review", 404));
   }
 };
 
-exports.getOneReview = () => {};
+exports.getOneReview = async (req, res, next) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    res.status(201).json({
+      status: "success",
+      data: {
+        review,
+      },
+    });
+  } catch (err) {
+    console.log("cannot get the review");
+    next(new AppError("There was an error getting the review", 400));
+  }
+};
 
-exports.updateReview = () => {};
+exports.updateReview = async (req, res, next) => {
+  try {
+    const review = await Review.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-exports.deleteReview = () => {};
+    res.status(200).json({
+      status: "success",
+      data: {
+        review,
+      },
+    });
+  } catch (err) {
+    console.log("there was an error updating the review");
+    next(new AppError("There was an error updating the review", 404));
+  }
+};
+
+exports.deleteReview = async (req,res,next) => {
+  try{
+    const review = await Review.findByIdAndDelete(req.params.id);
+   
+     res.status(200).json({
+      status: "success",
+      data: {
+        null
+      },
+    });
+    
+  }catch(err){
+       console.log('There was an error deleting the review');
+       next(new AppError('There was an error deleting ', 400))
+  }
+};

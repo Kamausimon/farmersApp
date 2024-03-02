@@ -18,7 +18,7 @@ router
   .route("/:id")
   .patch(
     authController.protectRoute,
-    authController.restrictTo("user"),
+    authController.restrictTo("user", "admin"),
     reviewController.updateReview
   );
 router
