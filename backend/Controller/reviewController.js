@@ -86,19 +86,16 @@ exports.updateReview = async (req, res, next) => {
   }
 };
 
-exports.deleteReview = async (req,res,next) => {
-  try{
+exports.deleteReview = async (req, res, next) => {
+  try {
     const review = await Review.findByIdAndDelete(req.params.id);
-   
-     res.status(200).json({
+
+    res.status(200).json({
       status: "success",
-      data: {
-        null
-      },
+      data: null,
     });
-    
-  }catch(err){
-       console.log('There was an error deleting the review');
-       next(new AppError('There was an error deleting ', 400))
+  } catch (err) {
+    console.log("There was an error deleting the review");
+    next(new AppError("There was an error deleting ", 400));
   }
 };
