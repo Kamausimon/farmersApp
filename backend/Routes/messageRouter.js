@@ -3,7 +3,7 @@ const messageController = require("../Controller/messageController");
 
 const router = express.Router();
 
-router.route("/message").get(messageController.getAllMessage);
+router.route("/message").get(messageController.getAllMessages);
 router.post("/message").post(messageController.sendMessage);
 
 //get message by id
