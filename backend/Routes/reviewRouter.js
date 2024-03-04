@@ -2,14 +2,15 @@ const express = require("express");
 const reviewController = require("../Controller/reviewController");
 const authController = require("../Controller/authController");
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.route("/").get(reviewController.getAllReviews);
 router
   .route("/")
   .post(
     authController.protectRoute,
-    authController.restrictTo("admin", "user"),
+    authController.restrictTo("user"),
+    reviewController.setProduceUserIds,
     reviewController.createReview
   );
 

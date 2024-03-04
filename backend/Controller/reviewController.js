@@ -1,9 +1,9 @@
 const Review = require("../Model/reviewModel");
 const AppError = require("../utils/AppError");
 
-exports.setTourUserIds = (req, res, next) => {
+exports.setProduceUserIds = (req, res, next) => {
   // Allow nested routes
-  if (!req.body.tour) req.body.tour = req.params.tourId;
+  if (!req.body.produce) req.body.tour = req.params.produceId;
   if (!req.body.user) req.body.user = req.user.id;
   next();
 };

@@ -11,6 +11,7 @@ dotenv.config({ path: "./config.env" });
 const produceRouter = require("./Routes/produceRouter");
 const userRouter = require("./Routes/userRouter");
 const reviewRouter = require("./Routes/reviewRouter");
+const messagesRouter = require("./Routes/messageRouter");
 
 //MIDDLEWARES
 app.use(express.json()); // this helps parse json data into req.body
@@ -23,6 +24,7 @@ if (process.env.NODE_ENV === "development") {
 app.use("/api/v1/produce", produceRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/reviews", reviewRouter);
+app.use("/api/v1/messages", messagesRouter);
 
 //this handles all calls made to unspecified urls in our app
 app.all("*", (req, res, next) => {
