@@ -3,4 +3,4 @@ const messageController = require("../Controller/messageController");
 
 const router = express.Router();
 
-module.exports = router;
+router.route("/message").module.exports = router;
