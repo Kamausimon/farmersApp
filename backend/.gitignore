@@ -12,3 +12,6 @@ config.env
 
 # Ignore build artifacts
 dist/
+
+#secret fille
+.env
