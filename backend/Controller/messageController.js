@@ -1,4 +1,4 @@
-const Messages = require("./messageController");
+const Messages = require("../Model/messageModel");
 const AppError = require("../utils/AppError");
 const app = require("../App");
 const http = require("http").Server(app);
@@ -21,7 +21,7 @@ io.on("connection", (socket) => {
 
 const fetchMessages = async (Id, res) => {
   try {
-    const messages = await Message.find(Id);
+    const messages = await Messages.find(Id).where({ visible: true });
 
     res.status(200).json({
       status: "success",
@@ -56,7 +56,7 @@ exports.newMessage = async (req, res, next) => {
     const { Id, content } = req.body;
 
     //use that info to create a new message body and await as you save to the db
-    const newMessage = await Message.create({ Id, content });
+    const newMessage = await Messages.create({ Id, content });
 
     if (userSockets[Id]) {
       io.to(userSockets[Id]).emit("message", newMessage);
@@ -74,14 +74,44 @@ exports.getOneMessage = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const message = await Message.findById(id);
+    const message = await Messages.findById(id).where({ visible: true });
+    //if message not found
     if (!message) {
-      return res.status(400).send({ error: "Message not found" });
+      return res.status(400).json({
+        status: "fail",
+        message: "Message not found",
+      });
     }
     res.message = message;
     next();
   } catch (err) {
     console.log("There was an error fetching the message", err);
     next(new AppError(" an error occurred while fetching the message", 404));
+  }
+};
+
+exports.deleteMessage = async (req, res, next) => {
+  try {
+    //find the id from the incoming parameter
+    const { id } = req.params;
+    const message = Messages.findByIdAndDelete(id);
+
+    //if not found?
+    if (!message) {
+      return res.status(400).send({ error: "The message was not found" });
+    }
+
+    //if the message is present set it as invisible in the database
+    message.visible = false;
+    await message.save();
+    //send a response back to the client
+    res.status(200).json({
+      status: "sucess",
+      data: null,
+      message: "message deleted successsfuly",
+    });
+  } catch (err) {
+    console.log("there was an error deleting the message", err);
+    next(new AppError("an error occurred while making the deletion", 400));
   }
 };
