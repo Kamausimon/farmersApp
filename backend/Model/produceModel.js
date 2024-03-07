@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const Review = require("./reviewModel");
+const User = require("./userModel");
 
 //create schema
 const produceSchema = new mongoose.Schema({
@@ -39,6 +41,20 @@ const produceSchema = new mongoose.Schema({
       enum: ["Point"], // 'location.type' must be 'Point'
     },
   },
+  reviews: [{ type: mongoose.Schema.ObjectId, ref: Review }],
+  user: [{ type: mongoose.Schema.ObjectId, ref: User }],
+});
+
+//this will populate the reviews eachtime we get a product and user who made the review each time get the product
+produceSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "reviews",
+    populate: {
+      path: "user",
+      model: "User",
+    },
+  });
+  next();
 });
 
 const Produce = mongoose.model("Produce", produceSchema);

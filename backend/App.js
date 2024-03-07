@@ -3,9 +3,36 @@ const morgan = require("morgan");
 const globalerrorHandler = require("./Controller/errorController");
 const AppError = require("./utils/AppError");
 const dotenv = require("dotenv");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const cors = require("cors");
+const mongoSanitize = require("express-mongo-sanitize");
+const hpp = require("hpp");
 
 const app = express();
 dotenv.config({ path: "./config.env" });
+
+//set up the security headers
+app.use(helmet());
+
+//limit many requests from the same API
+const limiter = rateLimit({
+  max: 100, //limit the requests to 100 requests per windowMs
+  windowMs: 60 * 60 * 1000, //1 hr
+  message:
+    "Too many requests from this ip address, kindly try again in an hour",
+  headers: true,
+});
+app.use("/api", limiter);
+
+//enable cors
+app.use(cors());
+
+//data sanitization against nosql injection
+app.use(mongoSanitize());
+
+//prevent parameter pollution
+app.use(hpp());
 
 //ROUTER
 const produceRouter = require("./Routes/produceRouter");
