@@ -2,7 +2,6 @@ const express = require("express");
 const morgan = require("morgan");
 const globalerrorHandler = require("./Controller/errorController");
 const AppError = require("./utils/AppError");
-const dotenv = require("dotenv");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const cors = require("cors");
@@ -10,7 +9,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const hpp = require("hpp");
 
 const app = express();
-dotenv.config({ path: "./config.env" });
+require("dotenv").config({ path: "./config.env" });
 
 //set up the security headers
 app.use(helmet());
