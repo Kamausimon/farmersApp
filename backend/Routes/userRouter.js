@@ -23,7 +23,12 @@ router
 router
   .route("/:id")
   .get(authController.protectRoute, userController.getOneUser);
-router.route("/:id").patch(userController.updateUserDetails);
-router.route("/:id").delete(userController.deleteUser);
+
+router
+  .route("/:id")
+  .patch(authController.protectRoute, userController.updateUserDetails);
+router
+  .route("/:id")
+  .delete(authController.protectRoute, userController.deleteUser);
 
 module.exports = router;
