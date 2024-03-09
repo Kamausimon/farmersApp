@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const Product = require("./produceModel");
+const User = require("./userModel");
 
 const messageSchema = new mongoose.Schema({
   sender: {
@@ -23,6 +25,11 @@ const messageSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
     select: false,
+  },
+  produce: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Product",
+    required: true,
   },
 });
 

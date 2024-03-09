@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const Product = require("./produceModel");
+const User = require("./userModel");
 
 const reviewSchema = new mongoose.Schema({
   review: {
@@ -27,6 +29,19 @@ const reviewSchema = new mongoose.Schema({
     required: [true, "review must belong to a user"],
   },
 });
+
+reviewSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "user",
+    select: "name",
+  }).populate({
+    path: "product",
+    select: "title",
+  });
+  next();
+});
+
+reviewSchema.index({ product: 1, user: 1 }, { unique: true });
 
 const Review = mongoose.model("Review", reviewSchema);
 

@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const Message = require("./messageModel");
 
 const userSchema = new mongoose.Schema({
   //name, email, password,passwordConfirm, photo
@@ -40,7 +39,7 @@ const userSchema = new mongoose.Schema({
   photo: String,
   role: {
     type: String,
-    enum: ["user", "admin", "Farmer"],
+    enum: ["user", "admin", "farmer"],
     default: "user",
   },
   passwordChangedAt: Date,
@@ -51,8 +50,6 @@ const userSchema = new mongoose.Schema({
     default: true,
     select: false,
   },
-
-  messages: [{ type: mongoose.Schema.ObjectId, ref: Message }],
 });
 
 //hashing and storing the password
@@ -80,12 +77,6 @@ userSchema.pre("save", async function (next) {
 //returns users that are active
 userSchema.pre(/^find/, function (next) {
   this.find({ active: { $ne: false } });
-  next();
-});
-
-//reference the message model so as to retrieve messages for each user once called
-userSchema.pre(/^find/, function (next) {
-  this.populate("messages");
   next();
 });
 

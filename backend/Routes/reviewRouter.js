@@ -4,7 +4,9 @@ const authController = require("../Controller/authController");
 
 const router = express.Router({ mergeParams: true });
 
-router.route("/").get(reviewController.getAllReviews);
+router
+  .route("/")
+  .get(authController.protectRoute, reviewController.getAllReviews);
 router
   .route("/")
   .post(

@@ -3,7 +3,7 @@ const AppError = require("../utils/AppError");
 
 exports.setProduceUserIds = (req, res, next) => {
   // Allow nested routes
-  if (!req.body.produce) req.body.tour = req.params.produceId;
+  if (!req.body.produce) req.body.produce = req.params.produceId;
   if (!req.body.user) req.body.user = req.user.id;
   next();
 };
@@ -31,7 +31,7 @@ exports.getAllReviews = async (req, res, next) => {
     });
     next();
   } catch (err) {
-    console.log("There was an error fetching the reviews");
+    console.log("There was an error fetching the reviews", err);
     next(new AppError("Error fetching the reviews", 404));
   }
 };
@@ -47,7 +47,7 @@ exports.createReview = async (req, res, next) => {
       },
     });
   } catch (err) {
-    console.log("cannot create the review");
+    console.log("cannot create the review", err);
     next(new AppError("There was an error while creating the review", 404));
   }
 };
