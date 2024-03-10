@@ -26,10 +26,8 @@ const produceSchema = new mongoose.Schema(
       type: String,
     },
     location: {
-      type: {
-        type: String,
-        enum: ["Point"],
-      },
+      type: String,
+      required: [true, "The produce must have a location"],
     },
     Quantity: {
       type: Number,
