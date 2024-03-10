@@ -9,7 +9,7 @@ router
   .route("/")
   .post(
     authController.protectRoute,
-    authController.restrictTo("farmer"),
+    authController.restrictTo("farmer", "admin"),
     produceController.createNewProduce
   );
 
