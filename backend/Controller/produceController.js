@@ -47,9 +47,13 @@ exports.createNewProduce = async (req, res, next) => {
   }
 };
 
+//this returns a single produce plus the reviews
 exports.getOneProduce = async (req, res, next) => {
   try {
-    const oneProduce = await Produce.findById(req.params.id);
+    const oneProduce = await Produce.findById(req.params.id).populate({
+      path: "review",
+      select: "review user produce createdAt",
+    });
 
     if (!oneProduce) {
       res.status(400).json({
@@ -60,9 +64,8 @@ exports.getOneProduce = async (req, res, next) => {
 
     res.status(200).json({
       status: "success",
-      data: {
-        oneProduce,
-      },
+      oneProduce,
+      review: oneProduce.review,
     });
   } catch (err) {
     res.status(400).json({

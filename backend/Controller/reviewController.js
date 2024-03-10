@@ -1,5 +1,7 @@
 const Review = require("../Model/reviewModel");
 const AppError = require("../utils/AppError");
+const APIFeatures = require("../utils/apiFeatures");
+const mongoose = require("mongoose");
 
 exports.setProduceUserIds = (req, res, next) => {
   // Allow nested routes
@@ -10,29 +12,26 @@ exports.setProduceUserIds = (req, res, next) => {
 
 exports.getAllReviews = async (req, res, next) => {
   try {
-    const { produceId } = req.params;
+    let filter = {};
+    if (req.params.produceId) filter = { tour: req.params.produceId };
 
-    //find the reviews by that id
-    const reviews = await Review.find({ produce: produceId });
+    const features = new APIFeatures(Review.find(filter), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    // const doc = await features.query.explain();
+    const reviews = await features.query;
 
-    //if the length of the returned query or none is found return an empty array
-    if (!reviews || reviews.length === 0) {
-      req.reviews = [];
-      return next();
-    }
-
-    //if present
-    req.reviews = reviews;
     res.status(200).json({
       status: "success",
       data: {
         reviews,
       },
     });
-    next();
   } catch (err) {
-    console.log("There was an error fetching the reviews", err);
-    next(new AppError("Error fetching the reviews", 404));
+    console.error("Error fetching the reviews:", err);
+    next(new AppError("Error fetching the reviews", 500));
   }
 };
 
@@ -49,21 +48,6 @@ exports.createReview = async (req, res, next) => {
   } catch (err) {
     console.log("cannot create the review", err);
     next(new AppError("There was an error while creating the review", 404));
-  }
-};
-
-exports.getOneReview = async (req, res, next) => {
-  try {
-    const review = await Review.findById(req.params.id);
-    res.status(201).json({
-      status: "success",
-      data: {
-        review,
-      },
-    });
-  } catch (err) {
-    console.log("cannot get the review");
-    next(new AppError("There was an error getting the review", 400));
   }
 };
 
